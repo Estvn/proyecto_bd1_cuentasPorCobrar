@@ -1,13 +1,40 @@
 <?php
 
-class Conection {
+class Connection {
 
+    static public function connect(){
+
+        $dataBaseName = "cuentas";
+        $hostName = "localhost";
+        $port = 25000;
+        //$dataSourceName = "ibm:DRIVER={IBM DB2 ODBC DRIVER};DATABASE=$dataBaseName;HOSTNAME=$hostName;PORT=$port;PROTOCOL=TCPIP;";
+        $dataSourceName = "odbc:DRIVER={IBM DB2 ODBC DRIVER};DATABASE=$dataBaseName;HOSTNAME=$hostName;PORT=$port;PROTOCOL=TCPIP;";
+
+        $userName = "db2admin";
+        $password = "00101011";
+
+        try{
+
+            $link = new PDO($dataSourceName, $userName, $password);
+            //$link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            //$link->exec("set names utf8");
+            echo "¡conexión exitosa!";
+            return $link;
+
+        }catch(PDOException $e){
+
+            echo "Error al conectarse al servicio DB2." . $e->getMessage();
+            return null;
+        }
+    }
+    
+    /*
     public static function odbcConnect() {
-        $database = 'SAMPLE';          // Nombre de la base de datos
+        $database = 'cuentas';          // Nombre de la base de datos
         $hostname = 'localhost';     // Nombre del host
         $user = 'db2admin';          // Usuario de la base de datos
         $password = '00101011';      // Contraseña de la base de datos
-        $port = 50000;               // Puerto de conexión
+        $port = 25000;               // Puerto de conexión
 
         // Crear la cadena de conexión
         $driver = "DRIVER={IBM DB2 ODBC DRIVER};";
@@ -33,9 +60,7 @@ class Conection {
     public static function odbcDisconnect($conn) {
         odbc_close($conn);
     }
-
-
-
+    */
 
     /*
     function db2Connect() {
@@ -51,9 +76,7 @@ class Conection {
     
         // Conectar a la base de datos
         $conn = db2_connect($conn_string, '', '');
-
         
-
         if ($conn) {
             return $conn;
         } else {
@@ -67,31 +90,4 @@ class Conection {
     }
     */
 
-    /*
-    static public function conect(){
-
-        $dataBaseName = "PRUEBA";
-        $hostName = "localhost";
-        $port = 25000;
-        //$dataSourceName = "ibm:DRIVER={IBM DB2 ODBC DRIVER};DATABASE=$dataBaseName;HOSTNAME=$hostName;PORT=$port;PROTOCOL=TCPIP;";
-        $dataSourceName = "odbc:DRIVER={IBM DB2 ODBC DRIVER};DATABASE=$dataBaseName;HOSTNAME=$hostName;PORT=$port;PROTOCOL=TCPIP;";
-
-        $userName = "db2inst1";
-        $password = "EKl676:(";
-
-        try{
-
-            $link = new PDO($dataSourceName, $userName, $password);
-            //$link->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $link->exec("set names utf8");
-            echo "¡conexión exitosa!";
-            return $link;
-
-        }catch(PDOException $e){
-
-            echo "Error al conectarse al servicio DB2." . $e->getMessage();
-            return null;
-        }
-    }
-    */
 }

@@ -4,10 +4,15 @@ class PruebaModel{
 
     static public function mostrarPrueba(){
 
+        $script = Connection::connect()->prepare("SELECT * FROM plazos");
+        $script->execute();
+        $result = $script->fetchAll(PDO::FETCH_CLASS);
+        $script->closeCursor();
+        $script = null;
+        return $result;
         
-        // Ejemplo de uso
+        /*
         $conn = Conection::odbcConnect(); // Para conectar sin SSL
-        // $conn = odbcConnect(true); // Para conectar con SSL
 
         if ($conn) {
             echo "Conexión satisfactoria.";
@@ -17,7 +22,7 @@ class PruebaModel{
         } else {
             echo "Conexión errónea.";
         }
-
+        */
 
         /*
         $conn = db2Connect();
@@ -40,17 +45,6 @@ class PruebaModel{
             // Desconectar de la base de datos
             db2Disconnect($conn);
         }
-
-        */
-
-        /*
-        $script = Conection::conect()->prepare("SELECT * FROM persona");
-
-        $script->execute();
-        $result = $script->fetchAll(PDO::FETCH_CLASS);
-        $script->closeCursor();
-        $script = null;
-        return $result;
         */
     }
 }
