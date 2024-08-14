@@ -2,29 +2,27 @@
 
 class PruebaController{
 
-    public function mostrarPersona(){
+    public function metodoControllerPrueba(){
 
-        $prueba = PruebaModel::mostrarPrueba();
+        // Convertir datos a UTF-8 antes de codificar a JSON
+        $prueba_utf8 = Utf8Convert::utf8_convert(PruebaModel::mostrarPrueba());
 
-        if(empty($prueba)){
-
-            $json=array(
-                "status"=>404,
-                "detalle"=>"Está vacío"
-            );
-
-            echo json_encode($json, true);
-            return;
-            
-        }else{
+        if(empty($prueba_utf8)){
 
             $json = array(
-                "status"=>200,
-                "detalle"=>$prueba
+                "status" => 404,
+                "detalle" => "Esta vacío"
             );
-    
-            echo json_encode($json, true);
-            return;
+
+        } else {
+
+            $json = array(
+                "status" => 200,
+                "detalle" => $prueba_utf8
+            );
         }
-    }
+        
+        echo json_encode($json, true);
+        return;
+    }     
 }
