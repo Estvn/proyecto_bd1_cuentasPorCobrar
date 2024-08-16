@@ -83,6 +83,32 @@ class ClienteController{
         }
     }
 
+    // Se muestran los clientes habilitados si el estado es 1. Se muestran los clientes inhabilitados solo para el admininstrador (estado 0).
+    public function readAllByState($estado){
+
+        // Llamando método para hacer la lectura en la tabla de Cliente
+        $clientes = Utf8Convert::utf8_convert(ClienteModel::readAllByState("cliente", $estado));
+
+        if(empty($clientes)){
+
+            $json=array(
+                "status"=>404,
+                "detalle"=>"No hay clientes almacenados en la base de datos."
+            );
+
+            echo json_encode($json, true);
+            return;
+        }else{
+            $json=array(
+                "status"=>200,
+                "detalle"=>$clientes
+            );
+
+            echo json_encode($json, true);
+            return;
+        }
+    }
+
     public function readAll(){
 
         // Llamando método para hacer la lectura en la tabla de Cliente
@@ -133,7 +159,30 @@ class ClienteController{
         }
     }
 
-    /*
+    public function updateClientState($clienteID){
+
+        $update = ClienteModel::updateClientState("cliente", $clienteID);
+
+        if($update=="ok"){
+
+            $json=array(
+                "status"=>200,
+                "detalle"=>"El cliente se ha habilitado correctamente."
+            );
+
+            echo json_encode($json, true);
+            return;
+        }else{
+            $json=array(
+                "status"=>404,
+                "detalle"=>"No está autorizado para modificar los datos de los clientes"
+            );
+
+            echo json_encode($json, true);
+            return;
+        }
+    }
+    
     public function delete($clienteID){
 
         $delete = ClienteModel::delete("cliente", $clienteID);
@@ -142,7 +191,7 @@ class ClienteController{
 
             $json=array(
                 "status"=>200,
-                "detalle"=>"El cliente se eliminó correctamente"
+                "detalle"=>"El cliente se eliminó correctamente."
             );
 
             echo json_encode($json, true);
@@ -160,6 +209,5 @@ class ClienteController{
 
         
     }
-    */
 
 }

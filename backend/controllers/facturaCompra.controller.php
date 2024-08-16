@@ -9,6 +9,8 @@ class FacturaCompraController {
             isset($datosFacturaCompra["deudaID"]) && isset($datosFacturaCompra["fechaCompra"]) &&
             isset($datosFacturaCompra["total"]) && isset($datosFacturaCompra["pagado"])
         ) {
+
+            /*
             // Preparando un arreglo con los datos que se quieren registrar.
             $datos = array(
                 "clienteID" => $datosFacturaCompra["clienteID"],
@@ -19,6 +21,7 @@ class FacturaCompraController {
                 "pagado" => $datosFacturaCompra["pagado"]
             );
 
+            */
             // Realizando el llamado del método para la inserción de los datos.
             $create = FacturaCompraModel::create("facturaCompra", $datos);
 

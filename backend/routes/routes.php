@@ -51,7 +51,7 @@ if(count(array_filter($arrayRutas)) >= 3){
 
         switch ($archiveRoute){
 
-            /*
+            
             // ESTE SOLO ES PARA PROBAR LA CONEXIÓN.
             case 'index.php';
 
@@ -65,6 +65,8 @@ if(count(array_filter($arrayRutas)) >= 3){
                     },
                     default => function() {
                         
+                        
+                        /*
                         $json=array(
                             "status"=>404,
                             "detalle"=>"Página no encontrada."
@@ -72,12 +74,13 @@ if(count(array_filter($arrayRutas)) >= 3){
 
                         echo json_encode($json, true);
                         return;
+                        */
                     }, 
                 };
 
                 $response();
             break;
-            */
+            
 
             case 'plazo.php':
 
@@ -225,7 +228,7 @@ if(count(array_filter($arrayRutas)) >= 3){
 
                     'GET' => function() use ($direccionController){
 
-                       $direccionController->readAll();
+                        $direccionController->readAll();
 
                     },
                     'POST' => function() use ($direccionController){
@@ -675,7 +678,7 @@ if(count(array_filter($arrayRutas)) >= 3){
 
                 $response = match($requestMethod){
 
-                    'GET' => function() use ($clienteController, $arrayRutas){
+                    'GET' => function() use ($clienteController, $arrayRutas, $queryParams){
 
                         if(count(array_filter($arrayRutas)) == 4 && is_numeric(end($arrayRutas))){
 
@@ -683,7 +686,10 @@ if(count(array_filter($arrayRutas)) >= 3){
                             
                         }elseif(count(array_filter($arrayRutas)) == 3){
 
-                            $clienteController->readAll();
+                            if(isset($queryParams['estado']) && is_numeric($queryParams['estado'])){
+
+                                $clienteController->readAllByState($queryParams['estado']);
+                            }
 
                         } else {
                                 
@@ -773,26 +779,40 @@ if(count(array_filter($arrayRutas)) >= 3){
                                 isset($_PUT['telEmpresa']) && isset($_PUT['sueldo'])
                             ){
 
-                                $datosCliente = array(
+                                if(isset($_PUT['estado'])){
+
+                                    if($_PUT['estado'] == 1){
+
+                                        $clienteController->updateClientState($queryParams['clienteID']);
                                     
-                                    "direccionID"=>$_PUT['direccionID'],
-                                    "generoID"=>$_PUT['generoID'],
-                                    "antiguedadID"=>$_PUT['antiguedadID'],
-                                    "pNombre"=>$_PUT['pNombre'],
-                                    "sNombre"=>$_PUT['sNombre'],
-                                    "pApellido"=>$_PUT['pApellido'],
-                                    "sApellido"=>$_PUT['sApellido'],
-                                    "fechaNacimiento"=>$_PUT['fechaNacimiento'],
-                                    "nIdentidad"=>$_PUT['nIdentidad'],
-                                    "creditoDisponible"=>$_PUT['creditoDisponible'],
-                                    "lineaDisponible"=>$_PUT['lineaDisponible'],
-                                    "nomEmpresa"=>$_PUT['nomEmpresa'],
-                                    "telEmpresa"=>$_PUT['telEmpresa'],
-                                    "sueldo"=>$_PUT['sueldo']
-                                );
+                                    }else{
 
-                                $clienteController->update($datosCliente, $queryParams['clienteID']);
+                                        $clienteController->delete($queryParams['clienteID']);
+                                    }
+                                
+                                }else{
 
+                                    $datosCliente = array(
+                                    
+                                        "direccionID"=>$_PUT['direccionID'],
+                                        "generoID"=>$_PUT['generoID'],
+                                        "antiguedadID"=>$_PUT['antiguedadID'],
+                                        "pNombre"=>$_PUT['pNombre'],
+                                        "sNombre"=>$_PUT['sNombre'],
+                                        "pApellido"=>$_PUT['pApellido'],
+                                        "sApellido"=>$_PUT['sApellido'],
+                                        "fechaNacimiento"=>$_PUT['fechaNacimiento'],
+                                        "nIdentidad"=>$_PUT['nIdentidad'],
+                                        "creditoDisponible"=>$_PUT['creditoDisponible'],
+                                        "lineaDisponible"=>$_PUT['lineaDisponible'],
+                                        "nomEmpresa"=>$_PUT['nomEmpresa'],
+                                        "telEmpresa"=>$_PUT['telEmpresa'],
+                                        "sueldo"=>$_PUT['sueldo']
+                                    );
+    
+                                    $clienteController->update($datosCliente, $queryParams['clienteID']);
+    
+                                }
                             }
                         }else{
 
@@ -842,7 +862,7 @@ if(count(array_filter($arrayRutas)) >= 3){
                             $facturaCompraController->readOne(end($arrayRutas));
 
                         }elseif(count(array_filter($arrayRutas)) == 3 && isset($queryParams['clienteID']) &&
-                         is_numeric($queryParams['clienteID'])){
+                            is_numeric($queryParams['clienteID'])){
 
                             $facturaCompraController->readAllByClient($queryParams['clienteID']);
 
@@ -856,8 +876,8 @@ if(count(array_filter($arrayRutas)) >= 3){
                             echo json_encode($json, true);
                             return;
                         }
-
                     },
+
                     'POST' => function() use ($facturaCompraController){
 
                         if(
@@ -873,7 +893,7 @@ if(count(array_filter($arrayRutas)) >= 3){
                                 "total"=>$_POST['total']
                             );
 
-                            //$facturaCompraController->create($datosFactura);
+                            $facturaCompraController->create($datosFactura);
 
                         }else{
 

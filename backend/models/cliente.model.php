@@ -11,10 +11,10 @@ class ClienteModel{
 
             " INSERT INTO $tablaCliente
             (direccionID, generoID, antiguedadID, pNombre, sNombre, pApellido, sApellido, fechaNacimiento, 
-             nIdentidad, creditoDisponible, lineaDisponible, nomEmpresa, telEmpresa, sueldo, create_at)
+             nIdentidad, creditoDisponible, lineaDisponible, nomEmpresa, telEmpresa, sueldo, create_at, estado)
             VALUES
             (:direccionID, :generoID, :antiguedadID, :pNombre, :sNombre, :pApellido, :sApellido, :fechaNacimiento,
-             :nIdentidad, :creditoDisponible, :lineaDisponible, :nomEmpresa, :telEmpresa, :sueldo, CURRENT DATE)
+             :nIdentidad, :creditoDisponible, :lineaDisponible, :nomEmpresa, :telEmpresa, :sueldo, CURRENT DATE, 0)
             "
         );
 
@@ -68,6 +68,41 @@ class ClienteModel{
 
         // Definiendo las variables de la consulta
         $query -> bindParam(":clienteID", $clienteID, PDO::PARAM_INT);
+
+        // Ejecución de la consulta.
+        $query->execute();
+
+        // Capturando los datos pedidos por la consulta.
+        $result = $query->fetchAll(PDO::FETCH_CLASS);
+
+        // Finalizando la variable de consulta, y retornando los datos solicitados.
+        $query->closeCursor();
+        $query=null;
+        return $result;
+    }
+
+    public static function readAllByState($tablaCliente, $estado){
+
+        // Preparación de la consulta de lectura.
+        $query = Connection::connect() -> prepare(
+
+            " SELECT DIRECCION.departamento, DIRECCION.municipio, 
+            GENERO.tipoGenero, 
+            ANTIGUEDAD.tipoAntiguedad, 
+            $tablaCliente.clienteID, $tablaCliente.pNombre, $tablaCliente.sNombre, $tablaCliente.pApellido,
+            $tablaCliente.sApellido, $tablaCliente.fechaNacimiento, $tablaCliente.nIdentidad,
+            $tablaCliente.creditoDisponible, $tablaCliente.lineaDisponible, $tablaCliente.nomEmpresa,
+            $tablaCliente.telEmpresa, $tablaCliente.sueldo
+            FROM $tablaCliente
+            INNER JOIN DIRECCION ON $tablaCliente.direccionID = DIRECCION.direccionID
+            INNER JOIN GENERO ON $tablaCliente.generoID = GENERO.generoID
+            INNER JOIN ANTIGUEDAD ON $tablaCliente.antiguedadID = ANTIGUEDAD.antiguedadID
+            WHERE $tablaCliente.estado = :estado
+            ORDER BY ($tablaCliente.pNombre || $tablaCliente.sNombre || $tablaCliente.pApellido || $tablaCliente.sApellido) ASC;
+            "
+        );
+
+        $query -> bindParam(":estado", $estado, PDO::PARAM_STR);
 
         // Ejecución de la consulta.
         $query->execute();
@@ -152,6 +187,32 @@ class ClienteModel{
         $query -> bindParam(":nomEmpresa", $datos["nomEmpresa"], PDO::PARAM_STR);
         $query -> bindParam(":telEmpresa", $datos["telEmpresa"], PDO::PARAM_STR);
         $query -> bindParam(":sueldo", $datos["sueldo"], PDO::PARAM_STR);
+        $query -> bindParam(":clienteID", $clienteID, PDO::PARAM_INT);
+
+        // Respuesta que se enviará al controllador que usó este método.
+        if($query -> execute()){
+            return "ok";
+        }else{
+            print_r(Connection::connect()->errorInfo());
+        }
+
+        // Finalizando la variable de consulta.
+        $query -> closeCursor();
+        $query = null;
+    }
+
+    public static function updateClientState($tablaCliente, $clienteID){
+
+        // Preparado la consulta para alterar una tabla.
+        $query = Connection::connect()->prepare(
+
+            " UPDATE $tablaCliente SET
+                estado = 1
+                WHERE clienteID = :clienteID;
+            "
+        );
+
+        // Definiendo las variables de la consulta.
         $query -> bindParam(":clienteID", $clienteID, PDO::PARAM_INT);
 
         // Respuesta que se enviará al controllador que usó este método.
