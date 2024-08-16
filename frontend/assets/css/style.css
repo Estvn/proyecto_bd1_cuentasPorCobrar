@@ -1,0 +1,118 @@
+
+
+#botonInicio{
+    position: absolute;
+    right: 550px;
+}
+
+#botonNosotros{
+    position: absolute;
+    right: 380px;
+}
+
+#botonCredito{
+    position: absolute;
+    right: 230px;
+}
+
+#botonAcceder{
+    position: absolute;
+    right: 70px;
+    top: 40px;
+}
+
+#Titulo{
+    position: absolute;
+    left: 130px;
+    color: saddlebrown;
+}
+
+#divTexto{
+    position: absolute;
+    top: 120px;
+    height: 70px;
+    width: 100000px;
+    background-color: saddlebrown;
+}
+
+#h1TextoSuperior{
+    position: absolute;
+    left: 340px;
+    color: white;
+    margin-top: 10px;
+}
+
+#divSiguienteTexto{
+    position: absolute;
+    top: 200px;
+}
+
+#h1SiguienteTexto{
+    position: fixed;
+    left: 270px;
+    font-size: 60px;
+    color: darkblue;
+}
+
+#divTexto2{
+    position: absolute;
+    top: 280px;
+}
+
+#h1Continuacion{
+    position: fixed;
+    left: 460px;
+    font-size: 60px;
+    color: darkblue;
+}
+
+
+#botonRegresar{
+    color: blue; 
+    border-radius: 10px; 
+    border: 2px solid blue; 
+    background-color: white; 
+    height: 50px; 
+    width: 140px;
+}
+
+
+
+.bodyLogin {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: white;
+}
+
+.login-container {
+    background-color: #ccc;
+    height: 500px;
+    width: 500px;
+    padding: 50px;
+    padding-top: 150px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+input[type="submit"] {
+    background-color: darkblue;
+    color: white;
+    margin-left: 120px;
+    margin-top: 70px;
+    padding: 15px;
+    width: 150px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+}
