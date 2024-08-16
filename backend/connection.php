@@ -4,16 +4,16 @@ class Connection {
 
 static public function connect(){
 
-    $dataBaseName = "PRUEBA";
+    $dataBaseName = "cuentas";
     $hostName = "localhost";
     $port = 25000;
     $dataSourceName = "odbc:DRIVER={IBM DB2 ODBC DRIVER};DATABASE=$dataBaseName;HOSTNAME=$hostName;PORT=$port;PROTOCOL=TCPIP;";
 
     //$userName = "db2admin";
-    //$password = "00101011";
+    //$password = "12345678";
 
-    $userName = "db2inst1";
-    $password = "EKl676:(";
+    $userName = "db2admin";
+    $password = "12345678";
 
     try {
         $link = new PDO($dataSourceName, $userName, $password);
