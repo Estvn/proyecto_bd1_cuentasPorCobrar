@@ -6,8 +6,8 @@ class FacturaCompraController {
         // Validar si el arreglo de datos viene con todos los datos necesarios.
         if (
             isset($datosFacturaCompra["clienteID"]) && isset($datosFacturaCompra["empleadoID"]) &&
-            isset($datosFacturaCompra["deudaID"]) && isset($datosFacturaCompra["fechaCompra"]) &&
-            isset($datosFacturaCompra["total"]) && isset($datosFacturaCompra["pagado"])
+            isset($datosFacturaCompra["plazoID"]) &&
+            isset($datosFacturaCompra["total"])
         ) {
 
             /*
@@ -23,15 +23,16 @@ class FacturaCompraController {
 
             */
             // Realizando el llamado del método para la inserción de los datos.
-            $create = FacturaCompraModel::create("facturaCompra", $datos);
+            $create = FacturaCompraModel::create("facturaCompra", $datosFacturaCompra);
 
             // Esto se ejecutará si la inserción fue correcta.
             if ($create == "ok") {
+
                 $json = array(
                     "status" => 200,
                     "detalle" => "La factura de la compra se registró exitosamente."
                 );
-
+             
                 echo json_encode($json, true);
                 return;
             }

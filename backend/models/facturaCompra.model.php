@@ -7,17 +7,26 @@ class FacturaCompraModel {
     public static function create($tablaFacturaCompra, $datos) {
         // Preparación de la consulta de inserción.
         $query = Connection::connect()->prepare(
-            "INSERT INTO $tablaFacturaCompra (clienteID, empleadoID, deudaID, fechaCompra, total, pagado) 
-             VALUES (:clienteID, :empleadoID, :deudaID, :fechaCompra, :total, :pagado)"
+            "INSERT INTO facturaCompra (
+    clienteID, 
+    empleadoID, 
+    plazoID, 
+    fechaCompra, 
+    total
+) VALUES (
+    :clienteID,
+    :empleadoID,
+    :plazoID,
+    CURRENT TIMESTAMP,
+    :total
+);"
         );
 
         // Definiendo las variables de la consulta
         $query->bindParam(':clienteID', $datos['clienteID'], PDO::PARAM_INT);
         $query->bindParam(':empleadoID', $datos['empleadoID'], PDO::PARAM_INT);
-        $query->bindParam(':deudaID', $datos['deudaID'], PDO::PARAM_INT);
-        $query->bindParam(':fechaCompra', $datos['fechaCompra']);
-        $query->bindParam(':total', $datos['total'], PDO::PARAM_STR);
-        $query->bindParam(':pagado', $datos['pagado'], PDO::PARAM_STR);
+        $query->bindParam(':plazoID', $datos['plazoID'], PDO::PARAM_INT);    
+        $query->bindParam(':total', $datos['total'], PDO::PARAM_STR);    
 
         // Respuesta que se enviará al controlador que llamó a este método.
         if ($query->execute()) {
@@ -92,6 +101,28 @@ class FacturaCompraModel {
         $query = null;
         return $result;
     }
+    public static function readIdOld($tablaFacturaCompra) {
+        // Preparación de la consulta de lectura.
+        $query = Connection::connect()->prepare(
+            "
+SELECT $tablaFacturaCompra.facturaCompraID, PLAZO.tipoPlazo 
+FROM $tablaFacturaCompra
+inner join PLAZO ON $tablaFacturaCompra.plazoID = PLAZO.plazoID
+ORDER BY $tablaFacturaCompra.facturaCompraID DESC 
+LIMIT 1;"
+        );
+        // Ejecución de la consulta.
+        $query->execute();
+
+        // Capturando los datos pedidos por la consulta.
+        $result = $query->fetchAll(PDO::FETCH_CLASS);
+
+        // Finalizando la variable de consulta, y retornando los datos solicitados.
+        $query->closeCursor();
+        $query = null;
+        return $result;
+    }
+
 
     /*
     public static function update($tablaFacturaCompra, $datos) {

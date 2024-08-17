@@ -240,7 +240,7 @@ class ClienteModel{
 
         // Respuesta que se envía al controlador que utilizó este método.
         if($query->execute()){
-            return "ok";
+          return "ok";
         }else{
             print_r(Connection::connect()->errorInfo());
         }

@@ -7,8 +7,18 @@ class DetalleCuotaModel {
     public static function create($tablaDetalleCuota, $datos) {
         // Preparación de la consulta de inserción.
         $query = Connection::connect()->prepare(
-            "INSERT INTO $tablaDetalleCuota (deudaID, fechaVencimiento, fechaPagado, estado, valorCuota) 
-             VALUES (:deudaID, :fechaVencimiento, :fechaPagado, :estado, :valorCuota)"
+            "INSERT INTO detalleCuota (
+    deudaID, 
+    fechaVencimiento, 
+    fechaPagado, 
+    estado
+) VALUES (
+    :deudaID, 
+    :fechaVencimiento, 
+    :fechaPagado, 
+    :estado
+);
+"
         );
 
         // Definiendo las variables de la consulta
@@ -16,7 +26,7 @@ class DetalleCuotaModel {
         $query->bindParam(':fechaVencimiento', $datos['fechaVencimiento']);
         $query->bindParam(':fechaPagado', $datos['fechaPagado']);
         $query->bindParam(':estado', $datos['estado'], PDO::PARAM_STR);
-        $query->bindParam(':valorCuota', $datos['valorCuota'], PDO::PARAM_STR);
+       
 
         // Respuesta que se enviará al controlador que llamó a este método.
         if($query->execute()) {

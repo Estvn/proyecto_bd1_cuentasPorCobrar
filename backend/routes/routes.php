@@ -895,6 +895,7 @@ if(count(array_filter($arrayRutas)) >= 3){
 
                             $facturaCompraController->create($datosFactura);
 
+
                         }else{
 
                             $json = array(
@@ -902,7 +903,7 @@ if(count(array_filter($arrayRutas)) >= 3){
                                 "status" => 404,
                                 "detalle" => "No se envió la información necesaria."
                             );
-
+                           
                             echo json_encode($json, true);
                             return;
                         }
