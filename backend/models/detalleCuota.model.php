@@ -6,30 +6,37 @@ class DetalleCuotaModel {
 
     public static function create($tablaDetalleCuota, $datos) {
         // Preparación de la consulta de inserción.
-        $query = Connection::connect()->prepare(
-            "INSERT INTO detalleCuota (
-    deudaID, 
-    fechaVencimiento, 
-    fechaPagado, 
-    estado
-) VALUES (
-    :deudaID, 
-    :fechaVencimiento, 
-    :fechaPagado, 
-    :estado
-);
-"
-        );
-
+        $pdo = Connection::connect();
         // Definiendo las variables de la consulta
-        $query->bindParam(':deudaID', $datos['deudaID'], PDO::PARAM_INT);
-        $query->bindParam(':fechaVencimiento', $datos['fechaVencimiento']);
-        $query->bindParam(':fechaPagado', $datos['fechaPagado']);
-        $query->bindParam(':estado', $datos['estado'], PDO::PARAM_STR);
+        $deudaID = $datos['deudaID'];  // Asegúrate de sanitizar $datos['deudaID'] para evitar inyecciones SQL
+        $numeroDeRegistros = $datos['tipoPlazo']; // Número de registros a insertar
+        
+        // Obtén la última fecha de vencimiento
+        $sql = "SELECT CURRENT DATE AS fechaVencimiento FROM SYSIBM.SYSDUMMY1;
+ 
+                   ";
+        $stmt = $pdo->query($sql);
+        $ultimaFecha = $stmt->fetchColumn();
+        
+        $fechaVencimiento = new DateTime($ultimaFecha);
+        
+        // Insertar los registros
+        for ($i = 0; $i < $numeroDeRegistros; $i++) {
+            $fechaVencimiento->modify('+1 month');
+            $fecha = $fechaVencimiento->format('Y-m-d');
+        
+            $sql = "INSERT INTO detalleCuota (deudaID, fechaVencimiento, estado) VALUES (:deudaID, :fechaVencimiento, '0')";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                ':deudaID' => $deudaID,
+                ':fechaVencimiento' => $fecha,
+            ]);
+        }
+
        
 
         // Respuesta que se enviará al controlador que llamó a este método.
-        if($query->execute()) {
+        if($i == $numeroDeRegistros ) {
             return "ok";
         } else {
             print_r(Connection::connect()->errorInfo());

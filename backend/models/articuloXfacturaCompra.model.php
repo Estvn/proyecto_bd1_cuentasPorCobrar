@@ -2,22 +2,29 @@
 
 //require_once "../connection.php";
 
+
+
 class ArticuloXFacturaCompraModel {
 
     public static function create($tablaArticuloXFacturaCompra, $datos) {
         // Preparación de la consulta de inserción.
         $query = Connection::connect()->prepare(
-            "INSERT INTO $tablaArticuloXFacturaCompra (facturaCompraID, articuloID, total) 
-             VALUES (:facturaCompraID, :articuloID, :total)"
+            "INSERT INTO $tablaArticuloXFacturaCompra (facturaCompraID, articuloID) 
+             VALUES (:facturaCompraID, :articuloID);"
         );
 
         // Definiendo las variables de la consulta
         $query->bindParam(':facturaCompraID', $datos['facturaCompraID'], PDO::PARAM_INT);
-        $query->bindParam(':articuloID', $datos['articuloID'], PDO::PARAM_INT);
-        $query->bindParam(':total', $datos['total'], PDO::PARAM_STR);
+        $articulos = count( $datos['articulos'][0][0]);
+        $count = 0;
 
+        for ($count; $count < $articulos ; $count++) {                      
+            $query->bindParam(':articuloID', $datos['articulos'][0][0][$count]['id'], PDO::PARAM_STR);            
+           $query->execute(); 
+        }        
+      
         // Respuesta que se enviará al controlador que llamó a este método.
-        if ($query->execute()) {
+        if ($count == $articulos) {
             return "ok";
         } else {
             print_r(Connection::connect()->errorInfo());

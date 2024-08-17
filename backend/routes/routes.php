@@ -890,7 +890,8 @@ if(count(array_filter($arrayRutas)) >= 3){
                                 "clienteID"=>$_POST['clienteID'],
                                 "empleadoID"=>$_POST['empleadoID'],
                                 "plazoID"=>$_POST['plazoID'],
-                                "total"=>$_POST['total']
+                                "total"=>$_POST['total'],
+                                "articulos"=>[$_POST['articulos']]
                             );
 
                             $facturaCompraController->create($datosFactura);

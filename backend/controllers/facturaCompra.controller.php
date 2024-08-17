@@ -6,8 +6,8 @@ class FacturaCompraController {
         // Validar si el arreglo de datos viene con todos los datos necesarios.
         if (
             isset($datosFacturaCompra["clienteID"]) && isset($datosFacturaCompra["empleadoID"]) &&
-            isset($datosFacturaCompra["plazoID"]) &&
-            isset($datosFacturaCompra["total"])
+            isset($datosFacturaCompra["plazoID"]) && isset($datosFacturaCompra["total"])&& 
+            isset($datosFacturaCompra["articulos"])
         ) {
 
             /*
@@ -28,13 +28,53 @@ class FacturaCompraController {
             // Esto se ejecutará si la inserción fue correcta.
             if ($create == "ok") {
 
-                $json = array(
-                    "status" => 200,
-                    "detalle" => "La factura de la compra se registró exitosamente."
-                );
-             
-                echo json_encode($json, true);
-                return;
+            
+                $result = FacturaCompraModel::readIdOld('facturaCompra');                     
+              $datosArticuloXFactura = array(
+                    'articulos'=> [$datosFacturaCompra['articulos']],
+                    'tipoPlazo'=> $result[0]->TIPOPLAZO,
+                    'facturaCompraID'=> $result[0]->FACTURACOMPRAID,
+                    
+                    'total'=> $datosFacturaCompra['total']
+              );
+               $createArticuloXFactura = ArticuloXFacturaCompraModel::create('articuloXfacturaCompra',$datosArticuloXFactura);
+               if($createArticuloXFactura == "ok"){
+
+                $datosDeuda = array(                    
+                    'tipoPlazo'=> $result[0]->TIPOPLAZO,
+                    'facturaCompraID'=> $result[0]->FACTURACOMPRAID,
+                    'clienteID'=>$datosFacturaCompra['clienteID'],
+                    'total'=> $datosFacturaCompra['total']
+              );
+
+                   // creamos el registo en la deuda
+                        $createDeuda = DeudaModel::createFromFactura('deuda',$datosDeuda);
+                        if($createDeuda == "ok"){
+                            
+                            $deudaID = DeudaModel::readIdOld('deuda')[0]->DEUDAID;
+                            $datosDetalleDeuda = array(                    
+                                'tipoPlazo'=> $result[0]->TIPOPLAZO,
+                                'deudaID'=> $deudaID
+                          );
+                            // creamos el registro de detalleCuota
+
+                            $createDetalleCuota = DetalleCuotaModel::create('deuda',$datosDetalleDeuda);
+                            if($createDetalleCuota == "ok"){
+                                $json = array( 
+                                    "status" => 200,
+                                    "detalle" => "Se ha Creado la Factura, el Registro en la Transacional ArticuloXfacturaCompra, la Deuda y los detalles de las deudas."
+                                );
+                                
+                                echo json_encode($json, true);
+                                return;
+    
+                            }
+                 
+                        }
+
+               
+
+               }
             }
         } else {
             $json = array(
