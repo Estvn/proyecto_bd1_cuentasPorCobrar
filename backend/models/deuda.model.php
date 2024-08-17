@@ -10,21 +10,20 @@ class DeudaModel{
         $query = Connection::connect()->prepare(
 
             " INSERT INTO $tablaDeuda
-            (clienteID, plazoID, valorCuota, montoDeuda, pagado)
+            (clienteID, facturaCompraID, valorCuota, pagado)
             VALUES
-            (:clienteID, :plazoID, :valorCuota, :montoDeuda, :pagado)
+            (:clienteID,:facturaCompraID,:valorCuota,'0')
             "
         );
-
+        $valorCuota = $datos["total"]/$datos["tipoPlazo"];
         // Definiendo las variables de la consulta
-        $query -> bindParam(":clienteID", $datos["clienteID"], PDO::PARAM_INT);
-        $query -> bindParam(":plazoID", $datos["plazoID"], PDO::PARAM_INT);
-        $query -> bindParam(":valorCuota", $datos["valorCuota"], PDO::PARAM_STR);
-        $query -> bindParam(":montoDeuda", $datos["montoDeuda"], PDO::PARAM_STR);
-        $query -> bindParam(":pagado", $datos["pagado"], PDO::PARAM_STR);
+        $query -> bindParam(":clienteID", $datos["clienteID"], PDO::PARAM_INT);    
+        $query -> bindParam(":facturaCompraID", $datos["facturaCompraID"], PDO::PARAM_INT);
+        $query -> bindParam(":valorCuota",$valorCuota, PDO::PARAM_STR);        
 
         // Respuesta que se enviará al controlador que llamo a este método.
-        if($query -> execute()){
+        if($query->execute()){
+        
             return "ok";
         }else{
             print_r(Connection::connect()->errorInfo());
@@ -85,6 +84,27 @@ class DeudaModel{
         // Finalizando la variable de consulta, y retornando los datos solicitados.
         $query->closeCursor();
         $query=null;
+        return $result;
+    }
+
+    public static function readIdOld($tablaDeuda) {
+        // Preparación de la consulta de lectura.
+        $query = Connection::connect()->prepare(
+            "
+SELECT $tablaDeuda.deudaID 
+FROM $tablaDeuda
+ORDER BY $tablaDeuda.facturaCompraID DESC 
+LIMIT 1;"
+        );
+        // Ejecución de la consulta.
+        $query->execute();
+
+        // Capturando los datos pedidos por la consulta.
+        $result = $query->fetchAll(PDO::FETCH_CLASS);
+
+        // Finalizando la variable de consulta, y retornando los datos solicitados.
+        $query->closeCursor();
+        $query = null;
         return $result;
     }
 

@@ -39,14 +39,40 @@ class FacturaCompraController {
               );
                $createArticuloXFactura = ArticuloXFacturaCompraModel::create('articuloXfacturaCompra',$datosArticuloXFactura);
                if($createArticuloXFactura == "ok"){
-              
-                $json = array(
-                    "status" => 200,
-                    "detalle" => "Se ha Creado la Factura Y el Registro en la Transacional ArticuloXfacturaCompra."
-                );
+
+                $datosDeuda = array(                    
+                    'tipoPlazo'=> $result[0]->TIPOPLAZO,
+                    'facturaCompraID'=> $result[0]->FACTURACOMPRAID,
+                    'clienteID'=>$datosFacturaCompra['clienteID'],
+                    'total'=> $datosFacturaCompra['total']
+              );
+
+                   // creamos el registo en la deuda
+                        $createDeuda = DeudaModel::createFromFactura('deuda',$datosDeuda);
+                        if($createDeuda == "ok"){
+                            
+                            $deudaID = DeudaModel::readIdOld('deuda')[0]->DEUDAID;
+                            $datosDetalleDeuda = array(                    
+                                'tipoPlazo'=> $result[0]->TIPOPLAZO,
+                                'deudaID'=> $deudaID
+                          );
+                            // creamos el registro de detalleCuota
+
+                            $createDetalleCuota = DetalleCuotaModel::create('deuda',$datosDetalleDeuda);
+                            if($createDetalleCuota == "ok"){
+                                $json = array( 
+                                    "status" => 200,
+                                    "detalle" => "Se ha Creado la Factura, el Registro en la Transacional ArticuloXfacturaCompra, la Deuda y los detalles de las deudas."
+                                );
+                                
+                                echo json_encode($json, true);
+                                return;
     
-                echo json_encode($json, true);
-                return;
+                            }
+                 
+                        }
+
+               
 
                }
             }
