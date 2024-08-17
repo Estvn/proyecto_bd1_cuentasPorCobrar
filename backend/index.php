@@ -17,6 +17,8 @@ require_once "controllers/empleado.controller.php";
 require_once "controllers/facturaCompra.controller.php";
 require_once "controllers/genero.controller.php";
 require_once "controllers/plazo.controller.php";
+require_once "controllers/articuloXFacturaCompra.controller.php";
+
 
 // Espacio para importar los modelos...
 require_once "models/prueba.model.php";
@@ -32,6 +34,7 @@ require_once "models/empleado.model.php";
 require_once "models/facturaCompra.model.php";
 require_once "models/genero.model.php";
 require_once "models/plazo.model.php";
+require_once "models/articuloXFacturaCompra.model.php";
 
 require_once "./utf8_convert.php";
 

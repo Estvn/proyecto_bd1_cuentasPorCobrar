@@ -6,8 +6,8 @@ class FacturaCompraController {
         // Validar si el arreglo de datos viene con todos los datos necesarios.
         if (
             isset($datosFacturaCompra["clienteID"]) && isset($datosFacturaCompra["empleadoID"]) &&
-            isset($datosFacturaCompra["plazoID"]) &&
-            isset($datosFacturaCompra["total"])
+            isset($datosFacturaCompra["plazoID"]) && isset($datosFacturaCompra["total"])&& 
+            isset($datosFacturaCompra["articulos"])
         ) {
 
             /*
@@ -28,13 +28,27 @@ class FacturaCompraController {
             // Esto se ejecutará si la inserción fue correcta.
             if ($create == "ok") {
 
+            
+                $result = FacturaCompraModel::readIdOld('facturaCompra');                     
+              $datosArticuloXFactura = array(
+                    'articulos'=> [$datosFacturaCompra['articulos']],
+                    'tipoPlazo'=> $result[0]->TIPOPLAZO,
+                    'facturaCompraID'=> $result[0]->FACTURACOMPRAID,
+                    
+                    'total'=> $datosFacturaCompra['total']
+              );
+               $createArticuloXFactura = ArticuloXFacturaCompraModel::create('articuloXfacturaCompra',$datosArticuloXFactura);
+               if($createArticuloXFactura == "ok"){
+              
                 $json = array(
                     "status" => 200,
-                    "detalle" => "La factura de la compra se registró exitosamente."
+                    "detalle" => "Se ha Creado la Factura Y el Registro en la Transacional ArticuloXfacturaCompra."
                 );
-             
+    
                 echo json_encode($json, true);
                 return;
+
+               }
             }
         } else {
             $json = array(
