@@ -93,27 +93,17 @@ class DeudaController {
         }
     }
 
-    public function updateStateToPayed($datosDeuda) {
+    public static function updateStateToPayed($deudaID) {
 
-        // Validar si el arreglo de datos viene con todos los datos necesarios.
-        if(
-            isset($datosDeuda["deudaID"]) && isset($datosDeuda["clienteID"]) &&
-            isset($datosDeuda["plazoID"]) && isset($datosDeuda["valorCuota"]) &&
-            isset($datosDeuda["montoDeuda"]) && isset($datosDeuda["pagado"])
-        ) {
-
-            $datos = array(
-                "deudaID" => $datosDeuda["deudaID"],
-                "clienteID" => $datosDeuda["clienteID"],
-                "plazoID" => $datosDeuda["plazoID"],
-                "valorCuota" => $datosDeuda["valorCuota"],
-                "montoDeuda" => $datosDeuda["montoDeuda"],
-                "pagado" => $datosDeuda["pagado"]
-            );
-
-            $update = DeudaModel::updateStateToPayed("deuda", $datos);
+            $update = DeudaModel::updateStateToPayed("deuda", $deudaID);
 
             if($update == "ok") {
+
+                $datosDeuda = DeudaModel::readOne("deuda", $deudaID);
+                $datosCliente = ClienteModel::readOne("cliente", $datosDeuda[0]->CLIENTEID);
+                $lineaCreditoSumada = $datosDeuda[0]->TOTAL + $datosCliente[0]->CREDITODISPONIBLE;
+                ClienteModel::updateCreditLineClient("cliente", $datosDeuda[0]->CLIENTEID, $lineaCreditoSumada);
+
                 $json = array(
                     "status" => 200,
                     "detalle" => "La actualización se realizó correctamente."
@@ -130,16 +120,6 @@ class DeudaController {
                 echo json_encode($json, true);
                 return;
             }
-
-        } else {
-            $json = array(
-                "status" => 404,
-                "detalle" => "No se ha enviado la información completa para actualizar la deuda."
-            );
-
-            echo json_encode($json, true);
-            return;
-        }
     }
 
     /*

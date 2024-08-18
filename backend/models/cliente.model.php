@@ -227,6 +227,36 @@ class ClienteModel{
         $query = null;
     }
 
+    public static function updateCreditLineClient($tablaCliente, $clienteID, $lineaCredito){
+
+        // Preparado la consulta para alterar una tabla.
+        $query = Connection::connect()->prepare(
+
+            " UPDATE $tablaCliente SET
+                creditoDisponible = :lineaCredito
+                WHERE clienteID = :clienteID;
+            "
+        );
+
+        // Definiendo las variables de la consulta.
+        $query -> bindParam(":clienteID", $clienteID, PDO::PARAM_INT);
+        $query -> bindParam(":lineaCredito", $lineaCredito, PDO::PARAM_STR);
+
+
+        // Respuesta que se enviará al controllador que usó este método.
+        if($query -> execute()){
+            return;
+        }else{
+            print_r(Connection::connect()->errorInfo());
+        }
+
+        // Finalizando la variable de consulta.
+        $query -> closeCursor();
+        $query = null;
+    }
+
+
+
     public static function delete($tablaCliente, $clienteID){
 
         // Preparando consulta de eliminación de datos de una tabla.

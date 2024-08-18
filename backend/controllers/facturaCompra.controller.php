@@ -28,24 +28,29 @@ class FacturaCompraController {
             // Esto se ejecutará si la inserción fue correcta.
             if ($create == "ok") {
 
+                // Las siguientes 3 líneas son para restar el credito del cliente con el total de la factura de la compra que ha realizado.
+                $cliente = ClienteModel::readOne("cliente", $datosFacturaCompra["clienteID"]);
+                $totalLineaCreditoCliente = (($cliente[0]->CREDITODISPONIBLE) - $datosFacturaCompra["total"]);
+                ClienteModel::updateCreditLineClient("cliente", $datosFacturaCompra["clienteID"], $totalLineaCreditoCliente);
             
                 $result = FacturaCompraModel::readIdOld('facturaCompra');                     
-              $datosArticuloXFactura = array(
+                $datosArticuloXFactura = array(
                     'articulos'=> [$datosFacturaCompra['articulos']],
                     'tipoPlazo'=> $result[0]->TIPOPLAZO,
                     'facturaCompraID'=> $result[0]->FACTURACOMPRAID,
                     
                     'total'=> $datosFacturaCompra['total']
-              );
-               $createArticuloXFactura = ArticuloXFacturaCompraModel::create('articuloXfacturaCompra',$datosArticuloXFactura);
-               if($createArticuloXFactura == "ok"){
+                );
+
+                $createArticuloXFactura = ArticuloXFacturaCompraModel::create('articuloXfacturaCompra',$datosArticuloXFactura);
+                if($createArticuloXFactura == "ok"){
 
                 $datosDeuda = array(                    
                     'tipoPlazo'=> $result[0]->TIPOPLAZO,
                     'facturaCompraID'=> $result[0]->FACTURACOMPRAID,
                     'clienteID'=>$datosFacturaCompra['clienteID'],
                     'total'=> $datosFacturaCompra['total']
-              );
+                );
 
                    // creamos el registo en la deuda
                         $createDeuda = DeudaModel::createFromFactura('deuda',$datosDeuda);
@@ -55,7 +60,7 @@ class FacturaCompraController {
                             $datosDetalleDeuda = array(                    
                                 'tipoPlazo'=> $result[0]->TIPOPLAZO,
                                 'deudaID'=> $deudaID
-                          );
+                        );
                             // creamos el registro de detalleCuota
 
                             $createDetalleCuota = DetalleCuotaModel::create('deuda',$datosDetalleDeuda);
@@ -67,15 +72,10 @@ class FacturaCompraController {
                                 
                                 echo json_encode($json, true);
                                 return;
-    
                             }
-                 
                         }
-
-               
-
-               }
-            }
+                    }
+                }
         } else {
             $json = array(
                 "status" => 404,

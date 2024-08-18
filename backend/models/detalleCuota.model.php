@@ -52,7 +52,7 @@ class DetalleCuotaModel {
         $query = Connection::connect()->prepare(
             "SELECT DEUDA.valorCuota as valorDeuda, DEUDA.montoDeuda, DEUDA.pagado,
             $tablaDetalleCuota.fechaVencimiento, $tablaDetalleCuota.fechaPagado, 
-            $tablaDetalleCuota.estado, $tablaDetalleCuota.valorCuota, 
+            $tablaDetalleCuota.estado, $tablaDetalleCuota.valorCuota, $tablaDetalleCuota.deudaID
             FROM $tablaDetalleCuota
             INNER JOIN DEUDA ON $tablaDetalleCuota.deudaID = DEUDA.deudaID
             WHERE $tablaDetalleCuota.detalleCuotaID = :detalleCuotaID"
@@ -73,15 +73,19 @@ class DetalleCuotaModel {
         return $result;
     }
 
-    public static function readAll($tablaDetalleCuota) {
+    public static function readAllByDeuda($tablaDetalleCuota, $deudaID) {
         // Preparación de la consulta de lectura.
         $query = Connection::connect()->prepare(
             "SELECT DEUDA.valorCuota as valorDeuda, DEUDA.montoDeuda, DEUDA.pagado,
             $tablaDetalleCuota.fechaVencimiento, $tablaDetalleCuota.fechaPagado, 
-            $tablaDetalleCuota.estado, $tablaDetalleCuota.valorCuota, 
+            $tablaDetalleCuota.estado, $tablaDetalleCuota.valorCuota
             FROM $tablaDetalleCuota
-            INNER JOIN DEUDA ON $tablaDetalleCuota.deudaID = DEUDA.deudaID;"
+            INNER JOIN DEUDA ON $tablaDetalleCuota.deudaID = DEUDA.deudaID
+            where $tablaDetalleCuota.deudaID = :deudaID
+            ;"
         );
+
+        $query->bindParam(':deudaID', $deudaID, PDO::PARAM_INT);
     
         // Ejecución de la consulta.
         $query->execute();
@@ -95,25 +99,16 @@ class DetalleCuotaModel {
         return $result;
     }
     
-    public static function update($tablaDetalleCuota, $datos) {
+    public static function update($tablaDetalleCuota, $detalleCuotaID) {
         // Preparado la consulta para alterar una tabla.
         $query = Connection::connect()->prepare(
             "UPDATE $tablaDetalleCuota 
-             SET deudaID = :deudaID,
-            fechaVencimiento = :fechaVencimiento,
-            fechaPagado = :fechaPagado,
-            estado = :estado,
-            valorCuota = :valorCuota 
-             WHERE detalleCuotaID = :detalleCuotaID"
+            SET estado = '1',
+            WHERE detalleCuotaID = :detalleCuotaID"
         );
 
         // Definiendo las variables de la consulta
-        $query->bindParam(':deudaID', $datos['deudaID'], PDO::PARAM_INT);
-        $query->bindParam(':fechaVencimiento', $datos['fechaVencimiento']);
-        $query->bindParam(':fechaPagado', $datos['fechaPagado']);
-        $query->bindParam(':estado', $datos['estado'], PDO::PARAM_STR);
-        $query->bindParam(':valorCuota', $datos['valorCuota'], PDO::PARAM_STR);
-        $query->bindParam(':detalleCuotaID', $datos['detalleCuotaID'], PDO::PARAM_INT);
+        $query->bindParam(':detalleCuotaID', $detalleCuotaID, PDO::PARAM_INT);
 
         // Respuesta que se enviará al controlador que usó este método.
         if($query->execute()) {
@@ -128,6 +123,7 @@ class DetalleCuotaModel {
         $query = null;
     }
 
+    /*
     public static function delete($tablaDetalleCuota, $detalleCuotaID) {
         // Preparando consulta de eliminación de datos de una tabla
         $query = Connection::connect()->prepare(
@@ -149,4 +145,5 @@ class DetalleCuotaModel {
         $query->closeCursor();
         $query = null;
     }
+        */
 }

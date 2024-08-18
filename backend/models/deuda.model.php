@@ -38,13 +38,14 @@ class DeudaModel{
         // Preparación de la consulta de lectura.
         $query = Connection::connect() -> prepare(
 
-            " SELECT CLIENTE.nIdentidad, (CLIENTE.pNombre || ' ' || CLIENTE.pApellido) as nombreCliente,
-            PLAZO.tipoPlazo, $tablaDeuda.valorCuota, $tablaDeuda.montoDeuda, $tablaDeuda.pagado
+            " SELECT CLIENTE.clienteID, CLIENTE.nIdentidad, (CLIENTE.pNombre || ' ' || CLIENTE.pApellido) as nombreCliente,
+            $tablaDeuda.valorCuota, $tablaDeuda.pagado
+            FACTURACOMPRA.total as total
             FROM $tablaDeuda
             INNER JOIN CLIENTE ON $tablaDeuda.clienteID = CLIENTE.clienteID
-            INNER JOIN PLAZO ON $tablaDeuda.plazoID = PLAZO.plazoID
+            INNER JOIN FACTURACOMPRA ON $tablaDeuda.facturaCompraID = FACTURACOMPRA.facturaCompraID
             WHERE deudaID = :deudaID;
-             "
+            "
         );
 
         // Definiendo las variables de la consulta
@@ -62,18 +63,21 @@ class DeudaModel{
         return $result;
     }
 
-    public static function readAllByClient($tablaDeuda){
+    public static function readAllByClient($tablaDeuda, $clienteID, $pagado){
 
         // Preparación de la consulta de lectura.
         $query = Connection::connect() -> prepare(
 
             " SELECT CLIENTE.nIdentidad, (CLIENTE.pNombre || ' '  || CLIENTE.pApellido) as nombreCliente,
-            PLAZO.tipoPlazo, $tablaDeuda.valorCuota, $tablaDeuda.montoDeuda, $tablaDeuda.pagado
+            $tablaDeuda.valorCuota, $tablaDeuda.pagado
             FROM $tablaDeuda
             INNER JOIN CLIENTE ON $tablaDeuda.clienteID = CLIENTE.clienteID
-            INNER JOIN PLAZO ON $tablaDeuda.plazoID = PLAZO.plazoID
-             "
+            where $tablaDeuda.clienteID = :clienteID and $tablaDeuda.pagado = :pagado
+            "
         );
+
+        $query -> bindParam(":clienteID", $clienteID, PDO::PARAM_INT);
+        $query -> bindParam(":pagado", $pagado, PDO::PARAM_INT);
 
         // Ejecución de la consulta.
         $query->execute();

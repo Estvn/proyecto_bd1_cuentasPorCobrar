@@ -1012,7 +1012,41 @@ if(count(array_filter($arrayRutas)) >= 3){
 
                 $response = match($requestMethod){
 
-                    'GET' => function() use ($detalleCuotaController){
+                    'GET' => function() use ($detalleCuotaController, $queryParams, $arrayRutas){
+
+                        if(count(array_filter($arrayRutas)) == 4 && is_numeric(end($arrayRutas))){
+
+                            $detalleCuotaController->readOne(end($arrayRutas));
+                            
+                        }elseif(count(array_filter($arrayRutas)) == 3){
+
+                            if(
+                            isset($queryParams['deudaID']) && is_numeric($queryParams['deudaID'])
+                            ){
+
+                                $detalleCuotaController->readAllByDeuda($queryParams['deudaID']);
+
+                            }else{
+
+                                $json=array(
+                                    "status"=>404,
+                                    "detalle"=>"No se enviaron los datos requeridos."
+                                );
+    
+                                echo json_encode($json, true);
+                                return;
+                            }
+
+                        } else {
+                                
+                            $json=array(
+                                "status"=>404,
+                                "detalle"=>"Página no encontrada"
+                            );
+
+                            echo json_encode($json, true);
+                            return;
+                        }
 
                     },
                     /*
@@ -1020,7 +1054,22 @@ if(count(array_filter($arrayRutas)) >= 3){
 
                     },
                     */
-                    'PUT' => function() use ($detalleCuotaController){
+                    'PUT' => function() use ($detalleCuotaController, $arrayRutas){
+
+                        if(count(array_filter($arrayRutas)) == 4 && is_numeric(end($arrayRutas))){
+
+                            $detalleCuotaController->update(end($arrayRutas));
+                            
+                        } else {
+                                
+                            $json=array(
+                                "status"=>404,
+                                "detalle"=>"Página no encontrada"
+                            );
+
+                            echo json_encode($json, true);
+                            return;
+                        }
 
                     },
                     /*

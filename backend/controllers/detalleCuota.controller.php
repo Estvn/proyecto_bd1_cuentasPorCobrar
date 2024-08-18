@@ -70,9 +70,9 @@ class DetalleCuotaController {
         }
     }
 
-    public function readAll() {
+    public function readAllByDeuda($deudaID) {
         // Llamando método para hacer la lectura en la tabla de DetalleCuota
-        $detalleCuotas = Utf8Convert::utf8_convert(DetalleCuotaModel::readAll("detalleCuota"));
+        $detalleCuotas = Utf8Convert::utf8_convert(DetalleCuotaModel::readAllByDeuda("detalleCuota", $deudaID));
 
         if (empty($detalleCuotas)) {
             $json = array(
@@ -91,49 +91,47 @@ class DetalleCuotaController {
         }
     }
 
-    public function update($datosDetalleCuota) {
+    public function update($detalleCuotaID) {
         // Validar si el arreglo de datos viene con todos los datos necesarios.
-        if (
-            isset($datosDetalleCuota["detalleCuotaID"]) && isset($datosDetalleCuota["deudaID"]) &&
-            isset($datosDetalleCuota["fechaVencimiento"]) && isset($datosDetalleCuota["fechaPagado"]) &&
-            isset($datosDetalleCuota["estado"]) && isset($datosDetalleCuota["valorCuota"])
-        ) {
-            $datos = array(
-                "detalleCuotaID" => $datosDetalleCuota["detalleCuotaID"],
-                "deudaID" => $datosDetalleCuota["deudaID"],
-                "fechaVencimiento" => $datosDetalleCuota["fechaVencimiento"],
-                "fechaPagado" => $datosDetalleCuota["fechaPagado"],
-                "estado" => $datosDetalleCuota["estado"],
-                "valorCuota" => $datosDetalleCuota["valorCuota"]
-            );
+        
+        $update = DetalleCuotaModel::update("detalleCuota", $detalleCuotaID);
 
-            $update = DetalleCuotaModel::update("detalleCuota", $datos);
+        if ($update == "ok") {
 
-            if ($update == "ok") {
-                $json = array(
-                    "status" => 200,
-                    "detalle" => "La actualización se realizó correctamente."
-                );
-                echo json_encode($json, true);
-                return;
-            } else {
-                $json = array(
-                    "status" => 500,
-                    "detalle" => "Error al actualizar la cuota."
-                );
-                echo json_encode($json, true);
-                return;
+            $deudaID = (DetalleCuotaModel::readOne("detalleCuota", $detalleCuotaID))[0]->DEUDAID;
+            $detalleCuotas = DetalleCuotaModel::readAllByDeuda("detalleCuota", $deudaID);
+
+            $todosEstanPagados = true;
+
+            foreach($detalleCuotas as $detalleCuota) {
+                if($detalleCuota->ESTADO != 1) {
+                    $todosEstanPagados = false;
+                    break; // Si encuentras un estado que no es 1, sales del ciclo
+                }
             }
+
+            if ($todosEstanPagados) {
+                DeudaController::updateStateToPayed($deudaID);
+            }
+
+            $json = array(
+                "status" => 200,
+                "detalle" => "La actualización se realizó correctamente."
+            );
+            echo json_encode($json, true);
+            return;
         } else {
             $json = array(
-                "status" => 400,
-                "detalle" => "No se ha enviado la información completa para actualizar la cuota."
+                "status" => 500,
+                "detalle" => "Error al actualizar la cuota."
             );
             echo json_encode($json, true);
             return;
         }
+    
     }
 
+    /*
     public function delete($detalleCuotaID) {
         // Validar si el ID del detalle de cuota está presente.
         if (isset($detalleCuotaID)) {
@@ -163,4 +161,5 @@ class DetalleCuotaController {
             return;
         }
     }
+        */
 }
